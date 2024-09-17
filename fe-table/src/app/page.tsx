@@ -49,8 +49,8 @@ export default function Home() {
       try {
         setLoading(true);
         const { page, pageSize } = paginationModel;
-        const sortField = sortModel[0]?.field || 'updatedAt';
-        const sortOrder = sortModel[0]?.sort?.toUpperCase() || 'ASC';
+        const sortField = sortModel[0]?.field || "updatedAt";
+        const sortOrder = sortModel[0]?.sort?.toUpperCase() || "DESC";
 
         const response = await fetch(
           "http://localhost:3001/employees?" +
@@ -58,14 +58,13 @@ export default function Home() {
               page: String(page + 1),
               limit: String(pageSize),
               sortField,
-              sortOrder
+              sortOrder,
             })
         );
         if (!response.ok) {
           throw new Error(`Error fetching data: ${response.statusText}`);
         }
         const data = await response.json();
-        console.log("data", data);
         setTotalRows(data.total);
         setRows(data.data);
         setLoading(false);
@@ -94,9 +93,17 @@ export default function Home() {
     try {
       // Persist updates in the database
       setLoading(true);
-      await new Promise((resolve) => {
-        setTimeout(resolve, 1000);
+      const response = await fetch("http://localhost:3001/employees", {
+        method: "PATCH",
+        body: JSON.stringify(unsavedChangesRef.current.unsavedRows),
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
+
+      if (!response.ok) {
+        throw new Error(`Error fetching data: ${response.statusText}`);
+      }
 
       setLoading(false);
 
@@ -135,7 +142,7 @@ export default function Home() {
   ];
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full bg-white text-black">
       <div className="flex justify-between items-center mb-4 p-5">
         <h2 className="text-2xl font-semibold">Editable Table</h2>
         <div className="flex justify-end">

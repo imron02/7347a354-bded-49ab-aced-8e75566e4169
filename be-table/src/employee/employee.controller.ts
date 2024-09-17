@@ -1,15 +1,16 @@
 import {
-  Controller,
-  Get,
-  Query,
-  Param,
-  Post,
   Body,
-  Put,
+  Controller,
   Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
 } from '@nestjs/common';
-import { EmployeeService } from './employee.service';
 import { Employee } from './employee.entity';
+import { EmployeeService } from './employee.service';
+import { UpdateEmployeeDto } from './dto/update-employee.dto';
 
 @Controller('employees')
 export class EmployeeController {
@@ -35,9 +36,20 @@ export class EmployeeController {
     return this.employeeService.create(employee);
   }
 
-  @Put(':id')
-  update(@Param('id') id: number, @Body() employee: Employee) {
-    return this.employeeService.update(id, employee);
+  @Patch()
+  async updateMultipleEmployees(
+    @Body() employeesData: Record<string, UpdateEmployeeDto>,
+  ) {
+    const updatedEmployees = [];
+    for (const key in employeesData) {
+      const employeeData = employeesData[key];
+      const updatedEmployee = await this.employeeService.update(
+        employeeData.id,
+        employeeData,
+      );
+      updatedEmployees.push(updatedEmployee);
+    }
+    return updatedEmployees;
   }
 
   @Delete(':id')
